@@ -45,12 +45,31 @@ npx expo start
 EXPO_PUBLIC_COMMIT=$(git rev-parse --short HEAD) npx expo start
 ```
 
+## Облачная сборка Android (EAS)
+
+APK собирается на серверах Expo (EAS Build), а не локально.
+
+1. Вкладка **Actions** в GitHub → workflow **Android build** → **Run workflow** (ветка `main`).
+2. Дождаться зелёного запуска — зелёный означает, что APK собран и готов.
+3. Ссылка на страницу сборки и короткий хеш коммита, с которого собрали APK, — в журнале
+   запуска (шаг «Publish build link») и в Summary запуска. На странице сборки в Expo есть
+   кнопка скачать APK.
+
+Авторизация в Expo — через токен `EXPO_TOKEN`, он лежит только в Secrets репозитория
+(Settings → Secrets and variables → Actions) и никогда не печатается в логи.
+
+Хеш коммита, с которого шла сборка, workflow сам кладёт в `EXPO_PUBLIC_COMMIT` на стороне
+EAS перед запуском сборки — экран «О приложении» в собранном APK показывает именно его,
+а не `dev`.
+
 ## Структура
 
 - `App.tsx` — переключение между экранами «Главная» и «О приложении» (без библиотек навигации).
 - `src/screens/` — экраны `HomeScreen.tsx`, `AboutScreen.tsx`.
 - `src/components/` — `Heading.tsx`, `TopicRow.tsx`, `AuthorRow.tsx`.
 - `src/data/landing.ts` — тексты и числа лендинга.
+- `eas.json` — профиль `preview` для облачной сборки Android.
+- `.github/workflows/android-build.yml` — workflow сборки APK (запускается только вручную).
 - `AGENTS.md` — правила работы с репозиторием.
 
 ## Как предложить изменение

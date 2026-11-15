@@ -1,0 +1,52 @@
+name: Android build
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Compute short commit hash
+        run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> "$GITHUB_ENV"
+
+      - name: Pass commit hash into EAS build environment
+        run: |
+          eas env:create --environment preview --name EXPO_PUBLIC_COMMIT \
+            --value "$SHORT_SHA" --visibility plaintext --non-interactive --force
+
+      - name: Build Android (preview)
+        run: eas build -p android --profile preview --non-interactive --wait | tee eas-build.log
+
+      - name: Publish build link
+        run: |
+          BUILD_URL=$(grep -Eo 'https://expo\.dev/accounts/[^[:space:]]+/builds/[^[:space:]]+' eas-build.log | head -n1)
+          echo "Commit: $SHORT_SHA"
+          echo "Build page: $BUILD_URL"
+          {
+            echo "### Android build"
+            echo ""
+            echo "- Commit: \`$SHORT_SHA\`"
+            echo "- Build page: $BUILD_URL"
+          } >> "$GITHUB_STEP_SUMMARY"

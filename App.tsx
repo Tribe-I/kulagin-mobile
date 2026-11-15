@@ -20,7 +20,7 @@ export default function App() {
         </Text>
       </Pressable>
       {screen === 'home' ? <HomeScreen /> : <AboutScreen />}
-      <StatusBar style="auto" />
+      <StatusBar style="dark" />
     </SafeAreaView>
   );
 }
