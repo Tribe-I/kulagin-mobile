@@ -20,6 +20,20 @@ npx expo start --web  # запуск в браузере (опционально
 EXPO_PUBLIC_COMMIT=$(git rev-parse --short HEAD) npx expo start
 ```
 
+## Облачная сборка Android
+
+Workflow `.github/workflows/android-build.yml` собирает Android APK через EAS Build.
+Запускается только вручную (`workflow_dispatch`) — вкладка **Actions** → **Android build** →
+**Run workflow**. На push ничего не собирается.
+
+Шаги workflow: `npm ci` → логин в EAS токеном из `secrets.EXPO_TOKEN` → вычислить короткий
+хеш коммита → положить его в `EXPO_PUBLIC_COMMIT` EAS-окружения `preview`
+(`eas env:create ... --force`) → `eas build -p android --profile preview --wait` → вывести
+ссылку на страницу сборки и хеш в журнал и в Summary запуска.
+
+Профиль `preview` в `eas.json` собирает internal APK и использует EAS-окружение `preview`
+(`"environment": "preview"`) — именно туда workflow кладёт `EXPO_PUBLIC_COMMIT` перед сборкой.
+
 ## Правила изменений
 
 - Напрямую в `main` не коммитим. Любое изменение — через отдельную ветку и Pull Request.
@@ -47,3 +61,5 @@ EXPO_PUBLIC_COMMIT=$(git rev-parse --short HEAD) npx expo start
 
 В репозиторий и коммиты не кладём пароли, ключи, токены, адреса внутренних сервисов и
 персональные данные. `EXPO_PUBLIC_COMMIT` — не секрет, это просто короткий хеш коммита.
+`EXPO_TOKEN` живёт только в Secrets репозитория (Settings → Secrets and variables → Actions),
+в `eas.json`/workflow/код не попадает и в логи не печатается.
