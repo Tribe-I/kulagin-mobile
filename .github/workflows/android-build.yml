@@ -37,7 +37,9 @@ jobs:
             --value "$SHORT_SHA" --visibility plaintext --non-interactive --force
 
       - name: Build Android (preview)
-        run: eas build -p android --profile preview --non-interactive --wait | tee eas-build.log
+        run: |
+          set -o pipefail
+          eas build -p android --profile preview --non-interactive --wait | tee eas-build.log
 
       - name: Publish build link
         run: |
