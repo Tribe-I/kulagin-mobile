@@ -21,6 +21,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "615cfb51-6a41-461f-afe2-77052f80e5e2"
+      }
+    },
+    "owner": "alexeykulagin"
   }
 }
